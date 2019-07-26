@@ -11,25 +11,179 @@
     <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
 
     <style type="text/css">
+      #myCanvas {
+        background-color: white;
+      }
+      .container {
+        height: 750px;
+        width: 750px;
+      }
+      #window {
+         height: 400px;
+        width: 730px;
+        overflow: scroll;
+        border:5px solid #00FFFF
+      }
+      ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+      ::-webkit-scrollbar-track {
+      border: 1px;
+      border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+      background: #88ba1c;  
+      }
+      #myTextArea {
+        border:2px solid #aaa;
+        border-radius: 4px;
+        padding: 8px;
+      }
+      #myTextArea: focus {
+        border-color:dodgerblue;
+      }
+      #postbutton {
+        border-radius:8px;
+        padding:5px;
+        border: 2px solid #EBF4FA;
+      }
+      #postbutton:hover {
+       border-radius:8px;
+        padding:5px;
+        border: 2px solid yellow
+      }
+      
+      
     </style>
 
 </head>
 <body>
     <!-- You may change the dimensions of this canvas -->
-    <canvas id="myCanvas" width="750px" height="750px"></canvas>
+<!--     <canvas id="myCanvas" width="750px" height="750px"></canvas> -->
+   <div class="container">
+     <center><h1>shrimp shrimp storyBoard</h1></center>
+     <div id="window"><p id="board"></p></div>
+      <label >Make your Own Story</label>
+      <button id="postbutton" type="button">post!</button>
+      <textarea id="myTextArea" rows="6" cols="88" > </textarea>
+
+   
+  
+  
 </body>
 <script>
+  var History = [];
+  //function 
+  function print(e) {
+    document.getElementById("board").innerText += "Chapter " + History.length + " " + History[History.length - 1] + "\n";
+  }
+  //button.addEventListener("click", sendmsg);
+  $("#postbutton").click(function()
+  {
+   sendmsg();
+    document.getElementById("myTextArea").value = null;
+  } );
+  function sendmsg() {
+    var str = document.getElementById("myTextArea").value;
+    var data = {story : str};
+    socket.send(JSON.stringify(data));
+  }
+//     var canvas = document.getElementById('myCanvas');
+//     var ctx = canvas.getContext('2d');
 
-    // setting up the canvas and one paper tool
-    var canvas = document.getElementById('myCanvas');
-    paper.setup(canvas);
-    var tool = new paper.Tool();
+//     var isActive = false;
+
+// // array to collect coordinates
+//     var plots = [];
+//     canvas.addEventListener('mousedown', startDraw, false);
+//     canvas.addEventListener('mousemove', draw, false);
+//     canvas.addEventListener('mouseup', endDraw, false);
+
+//     function draw(e) {
+//       if(!isActive) return;
+//   // cross-browser canvas coordinates
+//       var x = e.offsetX || e.layerX - canvas.offsetLeft;
+//       var y = e.offsetY || e.layerY - canvas.offsetTop;  
+//       plots.push({x: x, y: y});
+//       drawOnCanvas('BLACK', plots);
+// }
+//     ctx.lineWidth = '3';
+//     // setting up the canvas and one paper tool
+//     function drawOnCanvas(color, plots) {
+//       var data = {arr : plots};
+//       socket.send(JSON.stringify(data));
+//       ctx.beginPath();
+//       ctx.strokeStyle = color;
+//       ctx.moveTo(plots[0].x, plots[0].y);
+  
+//       for(var i=1; i<plots.length; i++) {
+//       ctx.lineTo(plots[i].x, plots[i].y);
+//   }
+//       ctx.stroke();
+// }
+//     function Newdrawing(color, plots) {
+//       ctx.beginPath();
+// //       ctx.strokeStyle = color;
+// //       ctx.moveTo(plots[0].x, plots[0].y);
+      
+//       ctx.strokeStyle = color;
+//       ctx.moveTo(plots[0].x, plots[0].y);
+//       for(var i=1; i<plots.length; i++) {
+//       ctx.lineTo(plots[i].x, plots[i].y);
+    
+        
+//   }
+//        ctx.stroke();
+      
+// }
+//     function startDraw(e) {
+//       isActive = true;
+// }
+
+//     function endDraw(e) {
+//       isActive = false;
+// // empty the array
+//       plots = [];
+// }    
+    //paper.setup(canvas);
+    //var tool = new paper.Tool();
 
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
+ 
+    var socket = new WebSocket('wss://p3-websockets-AlexLu83-jlu82282560.codeanyapp.com/ws/draw');
+    socket.onmessage = function(receivedMessage) {
+       //drawOnCanvas('red', plot);
+      //console.log(receivedMessage.data);
+      var msg = JSON.parse(receivedMessage.data);
+      History.push(msg.story);
+      print(History);
+      //Newdrawing('red', msg.arr);
+      
+      
+	// do something when you receive a message
+      };
+  
 
-    // var socket = new WebSocket(
-    //     'wss://<your url here>/ws/draw');
+// use when sending a message to the server
+// to be broadcasted to all clients, please add a delay
+
+// notify console if socket closes unexpectedly
+    socket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+  };
+
+  
+ 
+//     socket.onopen = function (e) {
+//     console.log("Connection opened.");
+//     this.send("Hello server!");
+//};
+
 
 
 </script>
